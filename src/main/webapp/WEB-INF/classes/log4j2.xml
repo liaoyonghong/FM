@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<configuration status="WARN" monitorInterval="1800">
+
+    <Properties>
+
+        <property name="logFileName">thcms</property>
+        <property name="basePath">${sys:catalina.home}/logs/${logFileName}</property>
+        <property name="console_log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %l - %m%n</property>
+        <property name="log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %C.%M[%L line] - %m%n</property>
+        <property name="every_file_size">20MB</property>
+        <property name="output_log_level">INFO</property>
+
+        <!-- All log -->
+        <property name="rolling_fileName">${basePath}/common.log</property>
+        <property name="rolling_filePattern">${basePath}/common-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="rolling_max">500</property>
+        <property name="rolling_timeInterval">1</property>
+        <property name="rolling_timeModulate">true</property>
+
+        <!-- Info log -->
+        <property name="info_fileName">${basePath}/info.log</property>
+        <property name="info_filePattern">${basePath}/info-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="info_max">100</property>
+        <property name="info_timeInterval">1</property>
+        <property name="info_timeModulate">true</property>
+
+        <!-- Warn log -->
+        <property name="warn_fileName">${basePath}/warn.log</property>
+        <property name="warn_filePattern">${basePath}/warn-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="warn_max">100</property>
+        <property name="warn_timeInterval">1</property>
+        <property name="warn_timeModulate">true</property>
+
+        <!-- Error log -->
+        <property name="error_fileName">${basePath}/error.log</property>
+        <property name="error_filePattern">${basePath}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="error_max">100</property>
+        <property name="error_timeInterval">1</property>
+        <property name="error_timeModulate">true</property>
+
+        <!-- emailScheduler log -->
+        <property name="emailScheduler_fileName">${basePath}/emailScheduler.log</property>
+        <property name="emailScheduler_filePattern">${basePath}/emailScheduler-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="emailScheduler_max">100</property>
+        <property name="emailScheduler_timeInterval">1</property>
+        <property name="emailScheduler_timeModulate">true</property>
+
+        <!-- console -->
+        <property name="console_print_level">DEBUG</property>
+
+    </Properties>
+
+    <appenders>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="${console_print_level}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${console_log_pattern}"/>
+        </Console>
+
+        <RollingFile name="RollingFile" fileName="${rolling_fileName}" filePattern="${rolling_filePattern}">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${rolling_timeInterval}" modulate="${warn_timeModulate}"/>
+                <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${rolling_max}"/>
+        </RollingFile>
+
+        <RollingFile name="InfoFile" fileName="${info_fileName}" filePattern="${info_filePattern}">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${info_timeInterval}" modulate="${info_timeModulate}"/>
+                <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${info_max}"/>
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="WarnFile" fileName="${warn_fileName}" filePattern="${warn_filePattern}">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${warn_timeInterval}" modulate="${warn_timeModulate}"/>
+                <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${warn_max}"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="${error_fileName}" filePattern="${error_filePattern}">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${error_timeInterval}" modulate="${error_timeModulate}"/>
+                <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${error_max}"/>
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="EmailScheduler" fileName="${emailScheduler_fileName}" filePattern="${emailScheduler_filePattern}">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${emailScheduler_timeInterval}" modulate="${emailScheduler_timeModulate}"/>
+                <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${emailScheduler_max}"/>
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+    </appenders>
+
+    <loggers>
+
+        <logger name="java.sql" level="DEBUG" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+        <logger name="org.mybatis.spring" level="WARN" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+        <logger name="org.springframework" level="WARN" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+        <logger name="com.qfx.workflow.service" level="WARN" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+
+        <root level="${output_log_level}">
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+            <appender-ref ref="InfoFile"/>
+            <appender-ref ref="WarnFile"/>
+            <appender-ref ref="ErrorFile"/>
+            <appender-ref ref="EmailScheduler"/>
+        </root>
+
+    </loggers>
+
+</configuration>

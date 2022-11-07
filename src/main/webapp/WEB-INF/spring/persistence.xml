@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+	<persistence-unit name="hibernatePersistenceUnit" transaction-type="RESOURCE_LOCAL">
+		<properties>
+			<!-- 0127 <property name="hibernate.hbm2ddl.auto" value="update" /> -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
+			<!-- <property name="hibernate.show_sql" value="true" /> -->
+		</properties>
+	</persistence-unit>
+</persistence>

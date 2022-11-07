@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   		http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--   <context:property-placeholder properties-ref="deployProperties" /> -->
+    <context:annotation-config/>
+
+    <!-- Scans the classpath for annotated components that will be auto-registered as Spring beans.
+     For example @Controller and @Service. Make sure to set the correct base-package -->
+    <context:component-scan base-package="com.versionsystem"/>
+
+    <!-- Configures the annotation-driven Spring MVC Controller programming model.
+    Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
+    <mvc:annotation-driven>
+        <!--  <mvc:path-matching registered-suffixes-only="true"/>-->
+
+        <mvc:message-converters>
+
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <bean class="com.versionsystem.common.KendoAwareObjectMapper"/>
+                </property>
+                <property name="prettyPrint" value="true"/>
+            </bean>
+
+        </mvc:message-converters>
+
+    </mvc:annotation-driven>
+
+
+    <!--	 <task:scheduled-tasks scheduler="emailScheduler">-->
+    <!--	  <task:scheduled ref="reportEmail" method="dayend" cron = "0 0 4 * * ?" />-->
+    <!-- <task:scheduled ref="reportEmail" method="sendMail" cron = "0 0 21 * * ?" />
+     <task:scheduled ref="reportEmail" method="sendMailByWeek"  cron = "0 0 22 * * SUN" />
+    <task:scheduled ref="reportEmail" method="sendMailByMonth" cron = "0 0 23 28-31 * ?" />
+     -->
+    <!--	 </task:scheduled-tasks>-->
+
+    <task:scheduler id="emailScheduler"/>
+
+
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/app/**" location="/WEB-INF/securityResources/app/"/>
+    <mvc:resources mapping="/bower_components/**" location="/WEB-INF/securityResources/bower_components/"/>
+    <mvc:resources mapping="/assets/**" location="/WEB-INF/securityResources/assets/"/>
+    <mvc:resources mapping="/components/**" location="/WEB-INF/securityResources/components/"/>
+    <mvc:resources mapping="/emr/**" location="/WEB-INF/securityResources/emr/"/>
+	<mvc:resources mapping="/downloadPath/**" location="/WEB-INF/resources/"/>
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <!--     TODO: 版本更新不一样了-->
+        <!--        <property name="mediaTypes">-->
+        <!--            <map>-->
+        <!--                <entry key="json" value="application/json"/>-->
+        <!--            </map>-->
+        <!--        </property>-->
+    </bean>
+
+    <bean id="urlFilenameController"
+          class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" p:order="1"/>
+
+    <!-- <bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
+      p:location="classpath:spring.properties" />
+     -->
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="maxUploadSize" value="20000000"/>
+        <property name="resolveLazily" value="true"/>
+    </bean>
+
+    <import resource="spring-data.xml"/>
+
+    <mvc:interceptors>
+        <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang"/>
+        </bean>
+    </mvc:interceptors>
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"/>
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    <!-- Unfortunately we have to repeat an instance of this class here because the mvc:message-converters element above
+         does not support <ref/> elements: -->
+    <bean id="jacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="prettyPrint" value="true"/>
+        <property name="objectMapper">
+            <bean class="com.versionsystem.common.KendoAwareObjectMapper"/>
+        </property>
+    </bean>
+
+    <!-- Allow Exceptions to be handled in annotated methods if desired.  Otherwise fallback to the
+         'restExceptionResolver' below: -->
+    <bean id="annotationMethodHandlerExceptionResolver"
+          class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver">
+        <property name="order" value="0"/>
+    </bean>
+
+</beans>

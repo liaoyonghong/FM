@@ -1,0 +1,9 @@
+/.idea
+/.gradle
+/build
+/gradle
+gradlew
+gradlew.bat
+/src/main/webapp/WEB-INF/securityResources/bower_components/*
+/src/main/webapp/WEB-INF/securityResources/app/*
+/src/main/webapp/WEB-INF/resources/*
